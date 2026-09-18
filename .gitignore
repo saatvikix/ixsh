@@ -1,0 +1,17 @@
+# Compiled binaries
+ixsh
+*.out
+
+# Object files
+*.o
+
+# Debugging
+core
+core.*
+
+# IDE/editor files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
