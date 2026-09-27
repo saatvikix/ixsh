@@ -4,6 +4,7 @@
     #include <stdlib.h>
 
     #include "parser.h"
+    #include "builtins.h"
 
     int main(void)
     {
@@ -30,6 +31,12 @@
             }
             
             Command command = parse_command(buffer);
+
+            if (handle_builtin(&command) == 1) {
+                
+                printf("Command Handled!\n");
+                continue;
+            }
 
             if(command.argv == NULL) {
                 printf("Failed to parse the command! \n");
