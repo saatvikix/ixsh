@@ -3,8 +3,10 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
+
 #include "parser.h"
 #include "builtins.h"
+#include "executor.h"
 
 int main(void)
 {
@@ -52,14 +54,8 @@ int main(void)
         {
             continue;
         }
-
-        printf("argc: %d\n", command.argc);
-
-        for (int i = 0; i < command.argc; i++)
-        {
-
-            printf("argv[%d] = \"%s\"\n", i, command.argv[i]);
-        }
+	
+	execute_command(&command);
 
         free(command.argv);
     }
