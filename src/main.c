@@ -1,57 +1,68 @@
-    #include <stdio.h>
-    #include <string.h>
-    #include <stdbool.h>
-    #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include "parser.h"
+#include "builtins.h"
 
-    #include "parser.h"
-    #include "builtins.h"
+int main(void)
+{
+    printf("Welcome to ixsh!\n");
 
-    int main(void)
+    while (true)
     {
-        printf("Welcome to ixsh!\n");
 
-        while(true) {
-
-            char buffer[1024];
-            printf("ixsh> ");
-            fflush(stdout);
-
-            // input like CTRL+Z
-            if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
-                printf("couldn't handle input\n");
-                break;
-            }
-
-            // remove newline
-            buffer[strcspn(buffer, "\n")] = '\0';
-
-            // break the terminal loop
-            if(strcmp(buffer, "exit") == 0) {
-                break;
-            }
-            
-            Command command = parse_command(buffer);
-
-            if (handle_builtin(&command) == 1) {
-                
-                printf("Command Handled!\n");
-                continue;
-            }
-
-            if(command.argv == NULL) {
-                printf("Failed to parse the command! \n");
-                continue;
-            }
-
-            printf("argc: %d\n", command.argc);
-
-            for(int i = 0; i < command.argc; i++) {
-
-                printf("argv[%d] = \"%s\"\n", i, command.argv[i]);
-            }
-
-            free(command.argv);
+        char buffer[1024];
+        char cwd[1024];
+        if (getcwd(cwd, sizeof(cwd)) == NULL)
+        {
+            perror("getcwd");
+            strcpy(cwd, "?");
         }
 
-        return 0;
+        printf("ixsh:%s> ", cwd);
+        fflush(stdout);
+
+        // input like CTRL+Z
+        if (fgets(buffer, sizeof(buffer), stdin) == NULL)
+        {
+            printf("couldn't handle input\n");
+            break;
+        }
+
+        // remove newline
+        buffer[strcspn(buffer, "\n")] = '\0';
+
+        // break the terminal loop
+        if (strcmp(buffer, "exit") == 0)
+        {
+            break;
+        }
+
+        Command command = parse_command(buffer);
+
+        if (command.argv == NULL)
+        {
+            printf("Failed to parse the command! \n");
+            continue;
+        }
+
+        if (handle_builtin(&command) == 1)
+        {
+            continue;
+        }
+
+        printf("argc: %d\n", command.argc);
+
+        for (int i = 0; i < command.argc; i++)
+        {
+
+            printf("argv[%d] = \"%s\"\n", i, command.argv[i]);
+        }
+
+        free(command.argv);
     }
+
+    return 0;
+}
