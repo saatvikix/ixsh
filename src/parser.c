@@ -1,4 +1,5 @@
 #include "parser.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -8,6 +9,10 @@ Command parse_command(char *buffer) {
     int capacity = 10;
 
     command.argc = 0;
+    command.input_file = NULL;
+    command.output_file = NULL;
+    command.append = 0;
+
     command.argv = malloc(capacity * sizeof(char *));
 
     if(command.argv == NULL) {
@@ -18,24 +23,63 @@ Command parse_command(char *buffer) {
 
     while(token != NULL) {
 
-        if(command.argc >= capacity - 1) {
-            capacity *= 2;
+        // input redirection
+        if(strcmp(token, "<") == 0) {
 
-            char **temp = realloc(command.argv, capacity * sizeof(char *));
-
-            if(temp == NULL) {
-                free(command.argv);
-                command.argc = 0;
-                command.argv = NULL;
-                return command;
+            token = strtok(NULL, " \t");
+            
+            if (token != NULL) {
+                command.input_file = token;
+                printf("Recieved file name %s for input\n", token);
+                command.append = 0;
             }
-
-            command.argv = temp;
         }
 
-        command.argv[command.argc] = token;
-        command.argc++;
+        // output redirection
+        else if (strcmp(token, ">") == 0) {
 
+            token = strtok(token, " \t");
+
+            if (token != NULL) {
+                command.output_file = token;
+                printf("Recieved file name %s for output\n", token);
+                command.append = 0;
+            }
+        }
+
+        // output redirection (append mode)
+        else if (strcmp(token, ">>") == 0) {
+
+            token = strtok(token, " \t");
+
+            if (token != NULL) {
+                command.output_file = token;
+                printf("Recieved file name %s for output (append mode)\n", token);
+                command.append = 1;
+            }
+        }
+
+        else {
+
+            if(command.argc >= capacity - 1) {
+                capacity *= 2;
+
+                char **temp = realloc(command.argv, capacity * sizeof(char *));
+
+                if(temp == NULL) {
+                    free(command.argv);
+                    command.argc = 0;
+                    command.argv = NULL;
+                    return command;
+                }
+
+                command.argv = temp;
+            }
+
+            command.argv[command.argc] = token;
+            command.argc++;            
+        }
+        
         token = strtok(NULL, " \t");
     }
 
