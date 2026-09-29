@@ -1,5 +1,4 @@
 #include "parser.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -30,7 +29,6 @@ Command parse_command(char *buffer) {
             
             if (token != NULL) {
                 command.input_file = token;
-                printf("Recieved file name %s for input\n", token);
                 command.append = 0;
             }
         }
@@ -42,7 +40,6 @@ Command parse_command(char *buffer) {
 
             if (token != NULL) {
                 command.output_file = token;
-                printf("Recieved file name %s for output\n", token);
                 command.append = 0;
             }
         }
@@ -54,7 +51,6 @@ Command parse_command(char *buffer) {
 
             if (token != NULL) {
                 command.output_file = token;
-                printf("Recieved file name %s for output (append mode)\n", token);
                 command.append = 1;
             }
         }
