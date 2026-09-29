@@ -36,7 +36,7 @@ Command parse_command(char *buffer) {
         // output redirection
         else if (strcmp(token, ">") == 0) {
 
-            token = strtok(token, " \t");
+            token = strtok(NULL, " \t");
 
             if (token != NULL) {
                 command.output_file = token;
@@ -47,7 +47,7 @@ Command parse_command(char *buffer) {
         // output redirection (append mode)
         else if (strcmp(token, ">>") == 0) {
 
-            token = strtok(token, " \t");
+            token = strtok(NULL, " \t");
 
             if (token != NULL) {
                 command.output_file = token;
