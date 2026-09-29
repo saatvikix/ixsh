@@ -52,10 +52,11 @@ int main(void)
 
         if (handle_builtin(&command) == 1)
         {
+            free(command.argv);
             continue;
         }
-	
-	execute_command(&command);
+
+        execute_command(&command);
 
         free(command.argv);
     }

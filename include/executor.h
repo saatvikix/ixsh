@@ -3,6 +3,7 @@
 
 #include "parser.h"
 
+int apply_redirection(Command *command);
 void execute_command(Command *command);
 
 #endif

@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-Command parse_command(char *buffer) {
+Command parse_command(char *buffer)
+{
 
     Command command;
     int capacity = 10;
@@ -14,55 +15,66 @@ Command parse_command(char *buffer) {
 
     command.argv = malloc(capacity * sizeof(char *));
 
-    if(command.argv == NULL) {
+    if (command.argv == NULL)
+    {
         return command;
     }
 
     char *token = strtok(buffer, " \t");
 
-    while(token != NULL) {
+    while (token != NULL)
+    {
 
         // input redirection
-        if(strcmp(token, "<") == 0) {
+        if (strcmp(token, "<") == 0)
+        {
 
             token = strtok(NULL, " \t");
-            
-            if (token != NULL) {
+
+            if (token != NULL)
+            {
                 command.input_file = token;
                 command.append = 0;
             }
         }
 
         // output redirection
-        else if (strcmp(token, ">") == 0) {
+        else if (strcmp(token, ">") == 0)
+        {
 
             token = strtok(NULL, " \t");
 
-            if (token != NULL) {
+            if (token != NULL)
+            {
                 command.output_file = token;
                 command.append = 0;
             }
         }
 
         // output redirection (append mode)
-        else if (strcmp(token, ">>") == 0) {
+        else if (strcmp(token, ">>") == 0)
+        {
 
             token = strtok(NULL, " \t");
 
-            if (token != NULL) {
+            if (token != NULL)
+            {
                 command.output_file = token;
                 command.append = 1;
             }
         }
 
-        else {
+        else
+        {
 
-            if(command.argc >= capacity - 1) {
+            if (command.argc >= capacity - 1)
+            {
                 capacity *= 2;
 
                 char **temp = realloc(command.argv, capacity * sizeof(char *));
 
-                if(temp == NULL) {
+                if (temp == NULL)
+                {
                     free(command.argv);
                     command.argc = 0;
                     command.argv = NULL;
@@ -73,14 +85,13 @@ Command parse_command(char *buffer) {
             }
 
             command.argv[command.argc] = token;
-            command.argc++;            
+            command.argc++;
         }
-        
+
         token = strtok(NULL, " \t");
     }
 
     command.argv[command.argc] = NULL;
 
     return command;
-
 }

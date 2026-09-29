@@ -5,38 +5,46 @@
 
 // 1: This command was a built in. It's been handeled
 // 0: The command wasn't a built-in. Need to handle it.
-int handle_builtin(Command *command) {
-    
-    if (command->argc == 0) {
+int handle_builtin(Command *command)
+{
+
+    if (command->argc == 0)
+    {
         return 1;
     }
 
     // cd
-    if (strcmp(command->argv[0], "cd") == 0) {
+    if (strcmp(command->argv[0], "cd") == 0)
+    {
 
-        if (command->argc < 2) {
+        if (command->argc < 2)
+        {
             printf("Invalid usage of cd: Missing arguments\n");
             return 1;
         }
 
-        if (chdir(command->argv[1]) != 0) {
+        if (chdir(command->argv[1]) != 0)
+        {
             perror("cd");
         }
 
-        return 1; 
+        return 1;
     }
 
     // pwd
 
-    if (strcmp(command->argv[0], "pwd") == 0) {
+    if (strcmp(command->argv[0], "pwd") == 0)
+    {
 
         char cwd[1024];
 
-        if(getcwd(cwd, sizeof(cwd)) == NULL) {
+        if (getcwd(cwd, sizeof(cwd)) == NULL)
+        {
             perror("pwd");
         }
 
-        else {
+        else
+        {
             printf("%s\n", cwd);
         }
 
@@ -44,7 +52,8 @@ int handle_builtin(Command *command) {
     }
 
     // help
-    if (strcmp(command->argv[0], "help") == 0) {
+    if (strcmp(command->argv[0], "help") == 0)
+    {
         printf(" =-=-=-=-=-=-= ixsh help =-=-=-=-=-=-=-=\n\n");
         printf("cd:               Change directory\n");
         printf("pwd:              Print current directory\n");

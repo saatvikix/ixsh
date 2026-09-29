@@ -1,7 +1,8 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-typedef struct {
+typedef struct
+{
     int argc;
     char **argv;
 
