@@ -62,6 +62,7 @@ int handle_builtin(Command *command)
 
     if (apply_redirection(command) < 0)
     {   
+        fflush(stdout);
         restore_descriptors(saved_in, saved_out);
         return 1;
     }
@@ -74,7 +75,7 @@ int handle_builtin(Command *command)
             printf("Invalid usage of cd: Missing arguments\n");
         }
 
-        if (chdir(command->argv[1]) != 0)
+        else if (chdir(command->argv[1]) != 0)
         {
             perror("cd");
         }
@@ -108,6 +109,7 @@ int handle_builtin(Command *command)
 
     }
 
+    fflush(stdout);
     restore_descriptors(saved_in, saved_out);
 
     return 1;
