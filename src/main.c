@@ -54,6 +54,16 @@ int main(void)
         // pipeline
         if (pipeline.has_pipe)
         {
+            if (pipeline.left.argc == 0 || pipeline.right.argc == 0)
+            {
+                printf("Invalid pipeline: missing command\n");
+
+                free(pipeline.left.argv);
+                free(pipeline.right.argv);
+
+                continue;
+            }
+            
             if (pipeline.right.argv == NULL)
             {
                 printf("Failed to parse pipeline!\n");
@@ -64,8 +74,7 @@ int main(void)
 
             execute_pipeline(
                 &pipeline.left,
-                &pipeline.right
-            );
+                &pipeline.right);
 
             free(pipeline.left.argv);
             free(pipeline.right.argv);
