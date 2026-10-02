@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <fcntl.h>
 
 #include "parser.h"
 #include "builtins.h"
@@ -15,9 +14,9 @@ int main(void)
 
     while (true)
     {
-
         char buffer[1024];
         char cwd[1024];
+
         if (getcwd(cwd, sizeof(cwd)) == NULL)
         {
             perror("getcwd");
@@ -27,36 +26,65 @@ int main(void)
         printf("ixsh:%s> ", cwd);
         fflush(stdout);
 
-        // input like CTRL+Z
         if (fgets(buffer, sizeof(buffer), stdin) == NULL)
         {
-            printf("couldn't handle input\n");
+            printf("\nExiting ixsh...\n");
             break;
         }
 
-        // remove newline
+        // Remove newline
         buffer[strcspn(buffer, "\n")] = '\0';
 
-        // break the terminal loop
+        // Exit shell
         if (strcmp(buffer, "exit") == 0)
         {
             break;
         }
 
-        Command command = parse_command(buffer);
+        // Parse command or pipeline
+        Pipeline pipeline = parse_pipeline(buffer);
 
-        if (command.argv == NULL)
+        // couldn't parse the left command
+        if (pipeline.left.argv == NULL)
         {
-            printf("Failed to parse the command! \n");
+            printf("Failed to parse command!\n");
             continue;
         }
 
+        // pipeline
+        if (pipeline.has_pipe)
+        {
+            if (pipeline.right.argv == NULL)
+            {
+                printf("Failed to parse pipeline!\n");
+
+                free(pipeline.left.argv);
+                continue;
+            }
+
+            execute_pipeline(
+                &pipeline.left,
+                &pipeline.right
+            );
+
+            free(pipeline.left.argv);
+            free(pipeline.right.argv);
+
+            continue;
+        }
+
+        // normal command
+
+        Command command = pipeline.left;
+
+        // built-in command
         if (handle_builtin(&command) == 1)
         {
             free(command.argv);
             continue;
         }
 
+        // external command
         execute_command(&command);
 
         free(command.argv);

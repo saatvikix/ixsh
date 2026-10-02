@@ -4,5 +4,5 @@
 #include "parser.h"
 
 void execute_command(Command *command);
-void execute_pipeline(Command *left, Command *right)
+void execute_pipeline(Command *left, Command *right);
 #endif
