@@ -95,3 +95,38 @@ Command parse_command(char *buffer)
 
     return command;
 }
+
+Pipeline parse_pipeline(char *buffer) 
+{
+    Pipeline pipeline;
+    pipeline.has_pipe = 0;
+
+    // find the first occurence of pipe
+    char *pipe_pos = strchr(buffer, '|');
+
+    if (pipe_pos == NULL) 
+    {
+        pipeline.left = parse_command(buffer);
+
+        pipeline.right.argc = 0;
+        pipeline.right.argv = NULL;
+        pipeline.right.input_file = NULL;
+        pipeline.right.output_file = NULL;
+        pipeline.right.append = 0;
+
+        return pipeline;
+    }
+
+    // replace the position of pipe with EOL
+    *pipe_pos = '\0';
+
+    char *left_part = buffer;
+    char *right_part = pipe_pos + 1;
+
+    pipeline.left = parse_command(left_part);
+    pipeline.right = parse_command(right_part);
+
+    pipeline.has_pipe = 1;
+
+    return pipeline;
+}

@@ -12,6 +12,14 @@ typedef struct
     int append;
 } Command;
 
+typedef struct 
+{
+    Command left;
+    Command right;
+    int has_pipe;
+} Pipeline;
+
 Command parse_command(char *buffer);
+Pipeline parse_pipeline(char *buffer);
 
 #endif
