@@ -24,7 +24,7 @@ Command parse_command(char *buffer)
     while (token != NULL)
     {
 
-        // input redirection
+        // Input redirection
         if (strcmp(token, "<") == 0)
         {
 
@@ -37,7 +37,7 @@ Command parse_command(char *buffer)
             }
         }
 
-        // output redirection
+        // Output redirection
         else if (strcmp(token, ">") == 0)
         {
 
@@ -50,7 +50,7 @@ Command parse_command(char *buffer)
             }
         }
 
-        // output redirection (append mode)
+        // Output redirection in append mode
         else if (strcmp(token, ">>") == 0)
         {
 

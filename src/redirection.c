@@ -6,7 +6,7 @@
 
 int apply_redirection(Command *command)
 {
-    // input redirection
+    // Redirect standard input from a file
     if (command->input_file != NULL) 
     {
         int fd = open(command->input_file, O_RDONLY);
@@ -27,7 +27,7 @@ int apply_redirection(Command *command)
         close(fd);
     }
 
-    // output redirection > & >>
+    // Redirect standard output to a file
     if (command->output_file != NULL) 
     {
         int flags = O_WRONLY | O_CREAT;

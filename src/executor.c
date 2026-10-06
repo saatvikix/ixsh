@@ -32,7 +32,7 @@ void execute_command(Command *command)
         exit(EXIT_FAILURE);
     }
 
-    // Parent waits for child
+    // Wait for the child
     wait(NULL);
 }
 
@@ -43,11 +43,11 @@ void execute_pipeline(Pipeline *pipeline)
     // (N-1) pipes are needed for N commands
     int pipes[command_count - 1][2];
 
-    // storing pids for al child processes so the parent can wait fot them
+    // Store child PIDs so the parent can wait for them
     pid_t pids[command_count];
 
 
-    // STEP 1: CREATE ALL PIPES
+    // Create the pipes before forking
     for (int i = 0; i < command_count - 1; i++)
     {
         if (pipe(pipes[i]) < 0)
@@ -57,7 +57,7 @@ void execute_pipeline(Pipeline *pipeline)
         }
     }
 
-    // STEP 2: FORK ALL CHILDREN
+    // Start one child for each command
     for (int i = 0; i < command_count; i++)
     {
         pids[i] = fork();
@@ -68,10 +68,10 @@ void execute_pipeline(Pipeline *pipeline)
             return;
         }
 
-        // CHILD PROCESS
+        // Child process
         if (pids[i] == 0)
         {
-            //  if this is not the first command, take input from the previous pipe
+            // Connect stdin to the previous pipe
             if (i > 0)
             {
                 if (dup2(pipes[i - 1][0], STDIN_FILENO) < 0)
@@ -81,7 +81,7 @@ void execute_pipeline(Pipeline *pipeline)
                 }
             }
 
-            // if this is not the last command, send output to the next pipe
+            // Connect stdout to the next pipe
             if (i < command_count - 1)
             {
                 if (dup2(pipes[i][1], STDOUT_FILENO) < 0)
@@ -91,7 +91,7 @@ void execute_pipeline(Pipeline *pipeline)
                 }
             }
 
-            // close al original desciptors in this child
+            // Close the original pipe descriptors
             for (int j = 0; j < command_count - 1; j++)
             {
                 close(pipes[j][0]);
@@ -100,19 +100,19 @@ void execute_pipeline(Pipeline *pipeline)
 
             Command *command = &pipeline->commands[i];
 
-            // handling bulitins
+            // Run built-ins inside the pipeline child
             if (handle_builtin(command) == 1)
             {
                 exit(EXIT_SUCCESS);
             }
 
-            // applying redirections if needed
+            // Apply redirection after connecting pipes
             if (apply_redirection(command) < 0)
             {
                 exit(EXIT_FAILURE);
             }
 
-            // external commands
+            // Run an external command
             execvp(command->argv[0], command->argv);
 
             perror("execvp");
@@ -120,14 +120,14 @@ void execute_pipeline(Pipeline *pipeline)
         }
     }
 
-    // STEP 3: PARENT CLOSES ALL PIPES
+    // Close pipe descriptors in the parent
     for (int i = 0; i < command_count - 1; i++)
     {
         close(pipes[i][0]);
         close(pipes[i][1]);
     }
 
-    // STEP 4: PARENT WAITS FOR CHILDREN
+    // Wait for all children
     for (int i = 0; i < command_count; i++)
     {
         waitpid(pids[i], NULL, 0);

@@ -32,16 +32,16 @@ int main(void)
             break;
         }
 
-        // Remove newline
+        // Remove the trailing newline
         buffer[strcspn(buffer, "\n")] = '\0';
 
-        // Exit shell
+        // Exit the shell
         if (strcmp(buffer, "exit") == 0)
         {
             break;
         }
 
-        // Parse either one command or multiple piped commands
+        // Parse one command or a pipeline
         Pipeline pipeline = parse_pipeline(buffer);
 
         if (pipeline.commands == NULL)
@@ -50,9 +50,7 @@ int main(void)
             continue;
         }
 
-        // ---------------------------------
-        // EMPTY INPUT
-        // ---------------------------------
+        // Ignore empty input
         if (pipeline.count == 1 &&
             pipeline.commands[0].argc == 0)
         {
@@ -60,9 +58,7 @@ int main(void)
             continue;
         }
 
-        // ---------------------------------
-        // VALIDATE PIPELINE
-        // ---------------------------------
+        // Check for missing commands in the pipeline
         int invalid_pipeline = 0;
 
         if (pipeline.count > 1)
@@ -87,9 +83,7 @@ int main(void)
             continue;
         }
 
-        // ---------------------------------
-        // MULTIPLE COMMANDS -> PIPELINE
-        // ---------------------------------
+        // Run piped commands
         if (pipeline.count > 1)
         {
             execute_pipeline(&pipeline);
@@ -98,9 +92,7 @@ int main(void)
             continue;
         }
 
-        // ---------------------------------
-        // SINGLE COMMAND
-        // ---------------------------------
+        // Run a single command
         Command *command = &pipeline.commands[0];
 
         // Built-in command

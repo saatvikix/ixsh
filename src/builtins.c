@@ -81,7 +81,7 @@ int handle_builtin(Command *command)
         }
     }
 
-    // pwd
+    // Print the current directory
     else if (strcmp(command->argv[0], "pwd") == 0)
     {
 
@@ -98,14 +98,22 @@ int handle_builtin(Command *command)
         }
     }
 
-    // help
+    // Show available commands
     else if (strcmp(command->argv[0], "help") == 0)
     {
-        printf(" =-=-=-=-=-=-= ixsh help =-=-=-=-=-=-=-=\n\n");
-        printf("cd:               Change directory\n");
-        printf("pwd:              Print current directory\n");
-        printf("help:             View this manual\n");
-        printf("exit:             Exit ixsh\n");
+        printf("ixsh help\n\n");
+        printf("Built-in commands:\n");
+        printf("  cd <directory>    Change directory\n");
+        printf("  pwd               Print current directory\n");
+        printf("  help              Show this help message\n");
+        printf("  exit              Exit ixsh\n\n");
+        printf("Redirection:\n");
+        printf("  command < file    Read input from a file\n");
+        printf("  command > file    Write output to a file\n");
+        printf("  command >> file   Append output to a file\n\n");
+        printf("Pipes:\n");
+        printf("  cmd1 | cmd2\n");
+        printf("  cmd1 | cmd2 | cmd3\n");
 
     }
 
