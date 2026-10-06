@@ -248,3 +248,7 @@ It shows the complete path through ixsh: parsing, input redirection, pipe creati
 ---
 
 ixsh is a learning project, but its core behavior follows the same Unix principles used by larger shells: parse a command, create processes when needed, connect file descriptors correctly, and clean up resources carefully.
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
