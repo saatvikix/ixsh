@@ -41,62 +41,79 @@ int main(void)
             break;
         }
 
-        // Parse command or pipeline
+        // Parse either one command or multiple piped commands
         Pipeline pipeline = parse_pipeline(buffer);
 
-        // couldn't parse the left command
-        if (pipeline.left.argv == NULL)
+        if (pipeline.commands == NULL)
         {
             printf("Failed to parse command!\n");
             continue;
         }
 
-        // pipeline
-        if (pipeline.has_pipe)
+        // ---------------------------------
+        // EMPTY INPUT
+        // ---------------------------------
+        if (pipeline.count == 1 &&
+            pipeline.commands[0].argc == 0)
         {
-            if (pipeline.left.argc == 0 || pipeline.right.argc == 0)
-            {
-                printf("Invalid pipeline: missing command\n");
-
-                free(pipeline.left.argv);
-                free(pipeline.right.argv);
-
-                continue;
-            }
-            
-            if (pipeline.right.argv == NULL)
-            {
-                printf("Failed to parse pipeline!\n");
-
-                free(pipeline.left.argv);
-                continue;
-            }
-
-            execute_pipeline(
-                &pipeline.left,
-                &pipeline.right);
-
-            free(pipeline.left.argv);
-            free(pipeline.right.argv);
-
+            free_pipeline(&pipeline);
             continue;
         }
 
-        // normal command
+        // ---------------------------------
+        // VALIDATE PIPELINE
+        // ---------------------------------
+        int invalid_pipeline = 0;
 
-        Command command = pipeline.left;
-
-        // built-in command
-        if (handle_builtin(&command) == 1)
+        if (pipeline.count > 1)
         {
-            free(command.argv);
+            for (int i = 0; i < pipeline.count; i++)
+            {
+                if (pipeline.commands[i].argc == 0)
+                {
+                    invalid_pipeline = 1;
+                    break;
+                }
+            }
+        }
+
+        if (invalid_pipeline)
+        {
+            printf(
+                "Invalid pipeline: missing command\n"
+            );
+
+            free_pipeline(&pipeline);
             continue;
         }
 
-        // external command
-        execute_command(&command);
+        // ---------------------------------
+        // MULTIPLE COMMANDS -> PIPELINE
+        // ---------------------------------
+        if (pipeline.count > 1)
+        {
+            execute_pipeline(&pipeline);
 
-        free(command.argv);
+            free_pipeline(&pipeline);
+            continue;
+        }
+
+        // ---------------------------------
+        // SINGLE COMMAND
+        // ---------------------------------
+        Command *command = &pipeline.commands[0];
+
+        // Built-in command
+        if (handle_builtin(command) == 1)
+        {
+            free_pipeline(&pipeline);
+            continue;
+        }
+
+        // External command
+        execute_command(command);
+
+        free_pipeline(&pipeline);
     }
 
     return 0;

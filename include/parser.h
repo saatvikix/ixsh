@@ -14,12 +14,12 @@ typedef struct
 
 typedef struct 
 {
-    Command left;
-    Command right;
-    int has_pipe;
+    Command *commands;
+    int count;
 } Pipeline;
 
 Command parse_command(char *buffer);
 Pipeline parse_pipeline(char *buffer);
+void free_pipeline(Pipeline *pipeline);
 
 #endif

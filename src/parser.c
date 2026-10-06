@@ -4,7 +4,6 @@
 
 Command parse_command(char *buffer)
 {
-
     Command command;
     int capacity = 10;
 
@@ -99,34 +98,65 @@ Command parse_command(char *buffer)
 Pipeline parse_pipeline(char *buffer) 
 {
     Pipeline pipeline;
-    pipeline.has_pipe = 0;
 
-    // find the first occurence of pipe
-    char *pipe_pos = strchr(buffer, '|');
+    pipeline.commands = NULL;
+    pipeline.count = 0;
 
-    if (pipe_pos == NULL) 
+    int command_count = 1;
+
+    for (int i = 0; buffer[i] != '\0'; i++)
     {
-        pipeline.left = parse_command(buffer);
+        if (buffer[i] == '|')
+        {
+            command_count++;
+        }
+    }
 
-        pipeline.right.argc = 0;
-        pipeline.right.argv = NULL;
-        pipeline.right.input_file = NULL;
-        pipeline.right.output_file = NULL;
-        pipeline.right.append = 0;
+    pipeline.commands = malloc(command_count * sizeof(Command));
 
+    if (pipeline.commands == NULL) 
+    {
         return pipeline;
     }
 
-    // replace the position of pipe with EOL
-    *pipe_pos = '\0';
+    char *segment_start = buffer;
+    int command_index = 0;
 
-    char *left_part = buffer;
-    char *right_part = pipe_pos + 1;
+    for (char *current = buffer; ; current++)
+    {
+        if (*current == '|' || *current == '\0')
+        {
+            int reached_end = (*current == '\0');
+            
+            *current = '\0';
 
-    pipeline.left = parse_command(left_part);
-    pipeline.right = parse_command(right_part);
+            pipeline.commands[command_index] = parse_command(segment_start);
+            command_index++;
 
-    pipeline.has_pipe = 1;
+            if (reached_end) break;
 
+            segment_start = current + 1;
+        }
+    }
+
+    pipeline.count = command_index;
     return pipeline;
+}
+
+void free_pipeline(Pipeline *pipeline)
+{
+    if (pipeline == NULL || pipeline->commands == NULL)
+    {
+        return;
+    }
+
+    for (int i = 0; i < pipeline->count; i++)
+    {
+        free(pipeline->commands[i].argv);
+    }
+
+    free(pipeline->commands);
+
+    pipeline->commands = NULL;
+    pipeline->count = 0;
 }
